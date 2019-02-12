@@ -31,9 +31,9 @@ class ReturnsForecast(BaseReturnsModel):
     """A single return forecast.
 
     Attributes:
-      alpha_data: A dataframe of return estimates.
-      delta_data: A confidence interval around the estimates.
-      half_life: Number of days for alpha auto-correlation to halve.
+      returns: A dataframe of return estimates.
+      delta: A confidence interval around the estimates.
+      gamma_decay: Number of days for alpha auto-correlation to halve.
     """
 
     def __init__(self, returns, delta=0., gamma_decay=None, name=None):
