@@ -278,25 +278,15 @@ class SinglePeriodOpt(BasePolicy):
 
         self.prob = cvx.Problem(
             cvx.Maximize(alpha_term - sum(costs)),
-            [cvx.sum(z) == 0] + constraints)
-        try:
-            self.prob.solve(solver=self.solver, **self.solver_opts)
+            [cvx.sum_entries(z) == 0] + constraints)
 
-            if self.prob.status == 'unbounded':
-                logging.error(
-                    'The problem is unbounded. Defaulting to no trades')
-                return self._nulltrade(portfolio)
+        self.prob.solve(solver=self.solver, **self.solver_opts)
 
-            if self.prob.status == 'infeasible':
-                logging.error(
-                    'The problem is infeasible. Defaulting to no trades')
-                return self._nulltrade(portfolio)
+        logging.error(
+            f'The problem is {self.prob.status}. Defaulting to no trades')
+        return self._nulltrade(portfolio)
 
-            return pd.Series(index=portfolio.index, data=(z.value * value))
-        except cvx.SolverError:
-            logging.error(
-                'The solver %s failed. Defaulting to no trades' % self.solver)
-            return self._nulltrade(portfolio)
+        return pd.Series(index=portfolio.index, data=(z.value.A1 * value))
 
 # class LookaheadModel():
 #     """Returns the planning periods for multi-period.
